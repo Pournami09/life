@@ -39,6 +39,9 @@ pids
 *.tmp
 *.temp
 
+# Vercel
+.vercel/
+
 
 
 

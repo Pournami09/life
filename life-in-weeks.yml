@@ -1,9 +1,7 @@
 '2001-03-09':
-- name: 🎂 i was born!
-  desc: i was born on a full moon night, which is why I was named Pournami, which
-    translates to full moon in Hindi. (pronounced as Pour-nuh-mee)
-  category: self
+  - name: 🎂 i was born!
+    desc: i was born on a full moon night, which is why I was named Pournami, which translates to full moon in Hindi. (pronounced as Pour-nuh-mee)
+    category: self
 '2023-08-08':
-- name: 🇺🇸 moved to the United States for my masters!
-  category: school
-
+  - name: 🇺🇸 moved to the United States for my masters!
+    category: school

@@ -8,6 +8,13 @@
   ],
   "routes": [
     {
+      "src": "/life-in-weeks.yml",
+      "dest": "/life-in-weeks.yml",
+      "headers": {
+        "Content-Type": "text/yaml"
+      }
+    },
+    {
       "src": "/(.*)",
       "dest": "/index.html"
     }

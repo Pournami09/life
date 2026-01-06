@@ -14,6 +14,10 @@
       }
     },
     {
+      "src": "/events.html",
+      "dest": "/events.html"
+    },
+    {
       "src": "/(.*)",
       "dest": "/index.html"
     }

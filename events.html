@@ -1,0 +1,974 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Events - Poro's Life</title>
+    <style>
+        @import url('https://unpkg.com/geist@latest/dist/font.css');
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: white;
+            color: #000;
+            font-size: 16px;
+            margin-left: 32px;
+            margin-right: 32px;
+            padding: 2rem 0;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            font-size: 24px;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            font-weight: 500;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: 1rem;
+            color: #000;
+            text-decoration: none;
+            font-size: 16px;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        .controls {
+            margin-bottom: 2rem;
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        button {
+            font-family: 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            font-size: 16px;
+            padding: 8px 16px;
+            border: 1px solid #ddd;
+            background: white;
+            color: #000;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: background-color 0.2s;
+        }
+
+        button:hover {
+            background-color: #f5f5f5;
+        }
+
+        .form-section {
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            display: none;
+        }
+
+        .form-section.show {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 4px;
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        input, textarea, select {
+            font-family: 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            font-size: 16px;
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .events-list {
+            margin-top: 2rem;
+        }
+
+        .event-item {
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            background: #fafafa;
+        }
+
+        .event-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .event-date-display {
+            font-weight: 500;
+            font-size: 16px;
+        }
+
+        .event-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .event-name-display {
+            font-size: 16px;
+            margin-bottom: 0.25rem;
+        }
+
+        .event-details {
+            font-size: 14px;
+            color: #666;
+            margin-top: 0.5rem;
+        }
+
+        .tag {
+            display: inline-block;
+            padding: 2px 8px;
+            margin: 2px;
+            background: #e3f2fd;
+            border-radius: 12px;
+            font-size: 12px;
+        }
+
+        .category-chip {
+            display: inline-block;
+            padding: 4px 12px;
+            margin: 2px;
+            margin-top: 8px;
+            background: #E5E5E5;
+            color: #474747;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .selection-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+            padding: 0.75rem;
+            background: #f5f5f5;
+            border-radius: 4px;
+            border: 1px solid #e0e0e0;
+        }
+
+        .select-all-container {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .select-all-container input[type="checkbox"] {
+            width: auto;
+            margin: 0;
+            cursor: pointer;
+        }
+
+        .select-all-container label {
+            margin: 0;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        .bulk-actions {
+            display: none;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .bulk-actions.visible {
+            display: flex;
+        }
+
+        .selected-count {
+            font-size: 14px;
+            color: #666;
+            font-weight: 500;
+        }
+
+        .event-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+        }
+
+        .event-item input[type="checkbox"] {
+            width: auto;
+            margin: 0;
+            margin-top: 0.25rem;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .event-item-content {
+            flex: 1;
+        }
+
+        .event-item.selected {
+            background: #fff3e0;
+            border-color: #FF6B35;
+        }
+
+        button.danger {
+            background: #d32f2f;
+            color: white;
+            border-color: #d32f2f;
+        }
+
+        button.danger:hover {
+            background: #b71c1c;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="index.html" class="back-link">← Back to Life Visualization</a>
+        <h1>Manage Events - Poro's Life</h1>
+        
+        <div class="controls">
+            <button id="toggle-form-btn">Add Event</button>
+            <button id="export-yaml-btn">Export YAML</button>
+            <button id="reload-btn">Reload from YAML</button>
+        </div>
+
+        <div id="form-section" class="form-section">
+            <h2 style="font-size: 16px; margin-bottom: 1rem; font-weight: 500;">Add/Edit Event</h2>
+            <form id="event-form">
+                <div class="form-group">
+                    <label for="event-date">Date (MM/DD/YYYY)</label>
+                    <input type="date" id="event-date" required>
+                </div>
+                <div class="form-group">
+                    <label for="event-name">Event Name *</label>
+                    <input type="text" id="event-name" required>
+                </div>
+                <div class="form-group">
+                    <label for="event-desc">Description</label>
+                    <textarea id="event-desc"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="event-category">Category</label>
+                    <select id="event-category">
+                        <option value="">Select category</option>
+                        <option value="self">Self</option>
+                        <option value="family">Family</option>
+                        <option value="relationships">Relationships</option>
+                        <option value="work">Work</option>
+                        <option value="school">School</option>
+                        <option value="writing">Writing</option>
+                        <option value="world">World</option>
+                        <option value="birthday">Birthday</option>
+                        <option value="goal">Goal</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="event-tags">Tags (comma-separated)</label>
+                    <input type="text" id="event-tags" placeholder="e.g., technology, politics">
+                </div>
+                <div class="form-group">
+                    <label for="event-link">Link (URL)</label>
+                    <input type="url" id="event-link">
+                </div>
+                <div class="form-group">
+                    <label for="event-images">Images (URLs, one per line, max 3)</label>
+                    <textarea id="event-images" placeholder="https://example.com/image1.jpg&#10;https://example.com/image2.jpg&#10;https://example.com/image3.jpg" rows="3"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="event-image-upload">Upload Images (max 3)</label>
+                    <input type="file" id="event-image-upload" accept="image/*" multiple>
+                    <div id="uploaded-images-preview" style="margin-top: 8px; display: flex; flex-direction: row; gap: 8px; flex-wrap: wrap;"></div>
+                </div>
+                <div class="form-group">
+                    <button type="submit">Save Event</button>
+                    <button type="button" id="cancel-form-btn">Cancel</button>
+                </div>
+            </form>
+        </div>
+
+        <div id="events-list" class="events-list"></div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/js-yaml@4.1.0/dist/js-yaml.min.js"></script>
+    <script>
+        let eventsData = {};
+        let editingEventKey = null;
+        let editingEventIndex = null;
+        let uploadedImages = []; // Store base64 images for current form
+        let selectedEvents = new Set(); // Track selected events by unique ID (date:index)
+
+        // Load from localStorage if available, otherwise from YAML
+        function loadFromStorage() {
+            const stored = localStorage.getItem('lifeEvents');
+            if (stored) {
+                try {
+                    return JSON.parse(stored);
+                } catch (e) {
+                    console.error('Error parsing stored data:', e);
+                }
+            }
+            return null;
+        }
+
+        function saveToStorage() {
+            localStorage.setItem('lifeEvents', JSON.stringify(eventsData));
+        }
+
+        function formatDate(dateStr) {
+            // Parse YYYY-MM-DD directly to avoid timezone issues
+            if (!dateStr) return '';
+            const parts = dateStr.split('-');
+            if (parts.length === 3) {
+                const year = parts[0];
+                const month = parts[1];
+                const day = parts[2];
+                return `${month}/${day}/${year}`;
+            }
+            // Fallback to Date parsing if format is unexpected
+            const date = new Date(dateStr);
+            return date.toLocaleDateString('en-US', { year: 'numeric', month: '2-digit', day: '2-digit' });
+        }
+
+        // Load and parse YAML file
+        async function loadData() {
+            try {
+                // Try to load from localStorage first
+                const storedData = loadFromStorage();
+                if (storedData) {
+                    eventsData = storedData;
+                    renderEventsList();
+                    return;
+                }
+
+                // Otherwise load from YAML file
+                const response = await fetch('life-in-weeks.yml');
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const yamlText = await response.text();
+                
+                if (!yamlText || yamlText.trim().length === 0) {
+                    throw new Error('YAML file is empty');
+                }
+                
+                eventsData = jsyaml.load(yamlText);
+                
+                if (!eventsData || Object.keys(eventsData).length === 0) {
+                    throw new Error('YAML file parsed but contains no data');
+                }
+                
+                // Normalize event data keys (remove quotes)
+                const normalizedData = {};
+                Object.keys(eventsData).forEach(key => {
+                    const normalizedKey = key.replace(/^'|'$/g, '');
+                    normalizedData[normalizedKey] = eventsData[key];
+                });
+                eventsData = normalizedData;
+                
+                saveToStorage();
+                renderEventsList();
+            } catch (error) {
+                console.error('Error loading data:', error);
+                alert('Error loading data: ' + error.message);
+            }
+        }
+
+        // Generate unique ID for an event
+        function getEventId(date, index) {
+            return `${date}:${index}`;
+        }
+
+        // Get total number of events
+        function getTotalEventCount() {
+            let count = 0;
+            Object.keys(eventsData).forEach(date => {
+                count += eventsData[date].length;
+            });
+            return count;
+        }
+
+        // Update select all checkbox state
+        function updateSelectAllState() {
+            const selectAllCheckbox = document.getElementById('select-all-checkbox');
+            if (!selectAllCheckbox) return;
+            
+            const total = getTotalEventCount();
+            const selected = selectedEvents.size;
+            
+            if (selected === 0) {
+                selectAllCheckbox.checked = false;
+                selectAllCheckbox.indeterminate = false;
+            } else if (selected === total) {
+                selectAllCheckbox.checked = true;
+                selectAllCheckbox.indeterminate = false;
+            } else {
+                selectAllCheckbox.checked = false;
+                selectAllCheckbox.indeterminate = true;
+            }
+        }
+
+        // Update bulk actions visibility
+        function updateBulkActions() {
+            const bulkActions = document.getElementById('bulk-actions');
+            const selectedCount = document.getElementById('selected-count');
+            
+            if (selectedEvents.size > 0) {
+                bulkActions.classList.add('visible');
+                selectedCount.textContent = `${selectedEvents.size} selected`;
+            } else {
+                bulkActions.classList.remove('visible');
+            }
+            updateSelectAllState();
+        }
+
+        // Toggle event selection
+        function toggleEventSelection(date, index) {
+            const eventId = getEventId(date, index);
+            if (selectedEvents.has(eventId)) {
+                selectedEvents.delete(eventId);
+            } else {
+                selectedEvents.add(eventId);
+            }
+            updateBulkActions();
+            renderEventsList(); // Re-render to update visual state
+        }
+
+        // Select all events
+        function selectAllEvents() {
+            const sortedDates = Object.keys(eventsData).sort();
+            sortedDates.forEach(date => {
+                const events = eventsData[date];
+                events.forEach((event, index) => {
+                    selectedEvents.add(getEventId(date, index));
+                });
+            });
+            updateBulkActions();
+            renderEventsList();
+        }
+
+        // Deselect all events
+        function deselectAllEvents() {
+            selectedEvents.clear();
+            updateBulkActions();
+            renderEventsList();
+        }
+
+        // Handle select all checkbox
+        function handleSelectAll() {
+            const selectAllCheckbox = document.getElementById('select-all-checkbox');
+            if (selectAllCheckbox.checked) {
+                selectAllEvents();
+            } else {
+                deselectAllEvents();
+            }
+        }
+
+        function renderEventsList() {
+            const container = document.getElementById('events-list');
+            container.innerHTML = '<h2 style="font-size: 16px; margin-bottom: 1rem; font-weight: 500;">Your Events</h2>';
+            
+            const sortedDates = Object.keys(eventsData).sort();
+            
+            if (sortedDates.length === 0) {
+                container.innerHTML += '<p style="font-size: 16px; color: #666;">No events yet. Add your first event above!</p>';
+                updateBulkActions();
+                return;
+            }
+            
+            // Add selection header
+            const selectionHeader = document.createElement('div');
+            selectionHeader.className = 'selection-header';
+            
+            const selectAllContainer = document.createElement('div');
+            selectAllContainer.className = 'select-all-container';
+            
+            const selectAllCheckbox = document.createElement('input');
+            selectAllCheckbox.type = 'checkbox';
+            selectAllCheckbox.id = 'select-all-checkbox';
+            selectAllCheckbox.onchange = handleSelectAll;
+            selectAllContainer.appendChild(selectAllCheckbox);
+            
+            const selectAllLabel = document.createElement('label');
+            selectAllLabel.htmlFor = 'select-all-checkbox';
+            selectAllLabel.textContent = 'Select all';
+            selectAllLabel.style.cursor = 'pointer';
+            selectAllContainer.appendChild(selectAllLabel);
+            
+            selectionHeader.appendChild(selectAllContainer);
+            
+            const bulkActions = document.createElement('div');
+            bulkActions.id = 'bulk-actions';
+            bulkActions.className = 'bulk-actions';
+            
+            const selectedCount = document.createElement('span');
+            selectedCount.id = 'selected-count';
+            selectedCount.className = 'selected-count';
+            bulkActions.appendChild(selectedCount);
+            
+            const deleteSelectedBtn = document.createElement('button');
+            deleteSelectedBtn.textContent = 'Delete selected';
+            deleteSelectedBtn.className = 'danger';
+            deleteSelectedBtn.onclick = handleBulkDelete;
+            bulkActions.appendChild(deleteSelectedBtn);
+            
+            selectionHeader.appendChild(bulkActions);
+            container.appendChild(selectionHeader);
+            
+            sortedDates.forEach(date => {
+                const events = eventsData[date];
+                events.forEach((event, index) => {
+                    const eventId = getEventId(date, index);
+                    const isSelected = selectedEvents.has(eventId);
+                    
+                    const eventDiv = document.createElement('div');
+                    eventDiv.className = 'event-item';
+                    if (isSelected) {
+                        eventDiv.classList.add('selected');
+                    }
+                    
+                    // Checkbox
+                    const checkbox = document.createElement('input');
+                    checkbox.type = 'checkbox';
+                    checkbox.checked = isSelected;
+                    checkbox.onchange = () => toggleEventSelection(date, index);
+                    eventDiv.appendChild(checkbox);
+                    
+                    // Event content
+                    const eventContent = document.createElement('div');
+                    eventContent.className = 'event-item-content';
+                    
+                    const header = document.createElement('div');
+                    header.className = 'event-item-header';
+                    
+                    const dateDisplay = document.createElement('div');
+                    dateDisplay.className = 'event-date-display';
+                    dateDisplay.textContent = formatDate(date);
+                    header.appendChild(dateDisplay);
+                    
+                    const actions = document.createElement('div');
+                    actions.className = 'event-actions';
+                    
+                    const editBtn = document.createElement('button');
+                    editBtn.textContent = 'Edit';
+                    editBtn.onclick = () => editEvent(date, index);
+                    actions.appendChild(editBtn);
+                    
+                    const deleteBtn = document.createElement('button');
+                    deleteBtn.textContent = 'Delete';
+                    deleteBtn.onclick = () => deleteEvent(date, index);
+                    actions.appendChild(deleteBtn);
+                    
+                    header.appendChild(actions);
+                    eventContent.appendChild(header);
+                    
+                    const nameDisplay = document.createElement('div');
+                    nameDisplay.className = 'event-name-display';
+                    nameDisplay.textContent = event.name;
+                    eventContent.appendChild(nameDisplay);
+                    
+                    const details = document.createElement('div');
+                    details.className = 'event-details';
+                    if (event.desc) {
+                        details.innerHTML += `<div>${event.desc}</div>`;
+                    }
+                    if (event.category) {
+                        const categoryDiv = document.createElement('div');
+                        categoryDiv.style.marginTop = '4px';
+                        const categoryChip = document.createElement('span');
+                        categoryChip.className = 'category-chip';
+                        categoryChip.textContent = event.category;
+                        categoryDiv.appendChild(categoryChip);
+                        details.appendChild(categoryDiv);
+                    }
+                    if (event.tags && event.tags.length > 0) {
+                        const tagsDiv = document.createElement('div');
+                        tagsDiv.style.marginTop = '4px';
+                        event.tags.forEach(tag => {
+                            const tagSpan = document.createElement('span');
+                            tagSpan.className = 'tag';
+                            tagSpan.textContent = tag;
+                            tagsDiv.appendChild(tagSpan);
+                        });
+                        details.appendChild(tagsDiv);
+                    }
+                    if (event.link) {
+                        details.innerHTML += `<div style="margin-top: 4px;"><a href="${event.link}" target="_blank">${event.link}</a></div>`;
+                    }
+                    if (event.images && event.images.length > 0) {
+                        const imagesDiv = document.createElement('div');
+                        imagesDiv.style.marginTop = '8px';
+                        imagesDiv.style.display = 'flex';
+                        imagesDiv.style.flexDirection = 'row';
+                        imagesDiv.style.gap = '8px';
+                        imagesDiv.style.flexWrap = 'wrap';
+                        event.images.slice(0, 3).forEach(imageUrl => {
+                            const img = document.createElement('img');
+                            img.src = imageUrl;
+                            img.alt = 'Event image';
+                            img.style.width = '100px';
+                            img.style.height = '100px';
+                            img.style.objectFit = 'cover';
+                            img.style.borderRadius = '4px';
+                            img.style.border = '1px solid #D0D0D0';
+                            img.onerror = function() { this.style.display = 'none'; };
+                            imagesDiv.appendChild(img);
+                        });
+                        details.appendChild(imagesDiv);
+                    }
+                    eventContent.appendChild(details);
+                    eventDiv.appendChild(eventContent);
+                    
+                    container.appendChild(eventDiv);
+                });
+            });
+            
+            updateSelectAllState();
+            updateBulkActions();
+        }
+
+        function editEvent(date, index) {
+            const event = eventsData[date][index];
+            editingEventKey = date;
+            editingEventIndex = index;
+            
+            document.getElementById('event-date').value = date;
+            document.getElementById('event-name').value = event.name || '';
+            document.getElementById('event-desc').value = event.desc || '';
+            document.getElementById('event-category').value = event.category || '';
+            document.getElementById('event-tags').value = event.tags ? event.tags.join(', ') : '';
+            document.getElementById('event-link').value = event.link || '';
+            document.getElementById('event-images').value = event.images ? event.images.filter(img => !img.startsWith('data:')).join('\n') : '';
+            
+            // Load uploaded images (base64)
+            uploadedImages = event.images ? event.images.filter(img => img.startsWith('data:')).slice(0, 3) : [];
+            updateImagePreview();
+            
+            document.getElementById('form-section').classList.add('show');
+            document.getElementById('toggle-form-btn').textContent = 'Cancel';
+        }
+
+        function deleteEvent(date, index) {
+            if (confirm('Are you sure you want to delete this event?')) {
+                const eventId = getEventId(date, index);
+                selectedEvents.delete(eventId);
+                eventsData[date].splice(index, 1);
+                if (eventsData[date].length === 0) {
+                    delete eventsData[date];
+                }
+                saveToStorage();
+                renderEventsList();
+            }
+        }
+
+        // Handle bulk delete
+        function handleBulkDelete() {
+            const selectedCount = selectedEvents.size;
+            if (selectedCount === 0) {
+                return;
+            }
+            
+            const confirmMessage = `Are you sure you want to delete ${selectedCount} event${selectedCount > 1 ? 's' : ''}?\n\nThis action cannot be undone.`;
+            
+            if (!confirm(confirmMessage)) {
+                return;
+            }
+            
+            // Collect events to delete (sorted by date, then index, in reverse to avoid index shifting issues)
+            const eventsToDelete = Array.from(selectedEvents).map(eventId => {
+                const [date, index] = eventId.split(':');
+                return { date, index: parseInt(index), eventId };
+            }).sort((a, b) => {
+                if (a.date !== b.date) {
+                    return a.date.localeCompare(b.date);
+                }
+                return b.index - a.index; // Reverse order for safe deletion
+            });
+            
+            const failedDeletions = [];
+            const successfulDeletions = [];
+            
+            // Delete events
+            eventsToDelete.forEach(({ date, index, eventId }) => {
+                try {
+                    if (eventsData[date] && eventsData[date][index]) {
+                        eventsData[date].splice(index, 1);
+                        successfulDeletions.push(eventId);
+                        
+                        if (eventsData[date].length === 0) {
+                            delete eventsData[date];
+                        }
+                    } else {
+                        failedDeletions.push(eventId);
+                    }
+                } catch (error) {
+                    console.error('Error deleting event:', error);
+                    failedDeletions.push(eventId);
+                }
+            });
+            
+            // Remove successfully deleted events from selection
+            successfulDeletions.forEach(eventId => {
+                selectedEvents.delete(eventId);
+            });
+            
+            // Save changes
+            saveToStorage();
+            
+            // Show feedback
+            if (failedDeletions.length === 0) {
+                alert(`Successfully deleted ${successfulDeletions.length} event${successfulDeletions.length > 1 ? 's' : ''}.`);
+            } else {
+                alert(`Deleted ${successfulDeletions.length} event${successfulDeletions.length > 1 ? 's' : ''}. ${failedDeletions.length} event${failedDeletions.length > 1 ? 's' : ''} could not be deleted.`);
+            }
+            
+            // Re-render list
+            renderEventsList();
+        }
+
+        function exportToYAML() {
+            // Make sure we're using the latest data from localStorage
+            const currentData = loadFromStorage();
+            const dataToExport = currentData || eventsData;
+            
+            if (!dataToExport || Object.keys(dataToExport).length === 0) {
+                alert('No events to export. Please add some events first.');
+                return;
+            }
+            
+            // Sort dates for better readability
+            const sortedData = {};
+            const sortedDates = Object.keys(dataToExport).sort();
+            sortedDates.forEach(date => {
+                sortedData[date] = dataToExport[date];
+            });
+            
+            const yaml = jsyaml.dump(sortedData, {
+                lineWidth: -1,
+                quotingType: '"',
+                forceQuotes: false,
+                sortKeys: false
+            });
+            
+            // Format dates with quotes to match the original format
+            const formattedYaml = yaml.replace(/^(\d{4}-\d{2}-\d{2}):/gm, "'$1':");
+            
+            const blob = new Blob([formattedYaml], { type: 'text/yaml' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'life-in-weeks.yml';
+            a.click();
+            URL.revokeObjectURL(url);
+            
+            alert('YAML file exported successfully! You can now replace the life-in-weeks.yml file with the downloaded file.');
+        }
+
+        // Form handlers
+        document.getElementById('toggle-form-btn').addEventListener('click', () => {
+            const formSection = document.getElementById('form-section');
+            if (formSection.classList.contains('show')) {
+                formSection.classList.remove('show');
+                document.getElementById('toggle-form-btn').textContent = 'Add Event';
+                editingEventKey = null;
+                editingEventIndex = null;
+                document.getElementById('event-form').reset();
+                document.getElementById('event-images').value = '';
+                uploadedImages = [];
+                updateImagePreview();
+            } else {
+                formSection.classList.add('show');
+                document.getElementById('toggle-form-btn').textContent = 'Cancel';
+            }
+        });
+
+        document.getElementById('cancel-form-btn').addEventListener('click', () => {
+            document.getElementById('form-section').classList.remove('show');
+            document.getElementById('toggle-form-btn').textContent = 'Add Event';
+            editingEventKey = null;
+            editingEventIndex = null;
+            document.getElementById('event-form').reset();
+            document.getElementById('event-images').value = '';
+            uploadedImages = [];
+            updateImagePreview();
+        });
+
+        document.getElementById('event-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const date = document.getElementById('event-date').value;
+            const name = document.getElementById('event-name').value;
+            const desc = document.getElementById('event-desc').value;
+            const category = document.getElementById('event-category').value;
+            const tagsStr = document.getElementById('event-tags').value;
+            const link = document.getElementById('event-link').value;
+            const imagesStr = document.getElementById('event-images').value;
+            
+            const event = {
+                name: name
+            };
+            
+            if (desc) event.desc = desc;
+            if (category) event.category = category;
+            if (tagsStr) {
+                event.tags = tagsStr.split(',').map(t => t.trim()).filter(t => t);
+            }
+            if (link) event.link = link;
+            
+            // Combine URL images and uploaded images (max 3 total)
+            const urlImages = imagesStr ? imagesStr.split('\n').map(img => img.trim()).filter(img => img) : [];
+            const allImages = [...uploadedImages, ...urlImages].slice(0, 3);
+            if (allImages.length > 0) {
+                event.images = allImages;
+            }
+            
+            if (editingEventKey && editingEventIndex !== null) {
+                // Editing existing event
+                if (editingEventKey !== date) {
+                    // Date changed, remove from old date and add to new
+                    eventsData[editingEventKey].splice(editingEventIndex, 1);
+                    if (eventsData[editingEventKey].length === 0) {
+                        delete eventsData[editingEventKey];
+                    }
+                    if (!eventsData[date]) {
+                        eventsData[date] = [];
+                    }
+                    eventsData[date].push(event);
+                } else {
+                    // Same date, just update
+                    eventsData[date][editingEventIndex] = event;
+                }
+            } else {
+                // Adding new event
+                if (!eventsData[date]) {
+                    eventsData[date] = [];
+                }
+                eventsData[date].push(event);
+            }
+            
+            saveToStorage();
+            renderEventsList();
+            
+            document.getElementById('form-section').classList.remove('show');
+            document.getElementById('toggle-form-btn').textContent = 'Add Event';
+            editingEventKey = null;
+            editingEventIndex = null;
+            document.getElementById('event-form').reset();
+            document.getElementById('event-images').value = '';
+            uploadedImages = [];
+            updateImagePreview();
+        });
+
+        // Image upload handler
+        function handleImageUpload(files) {
+            uploadedImages = [];
+            const fileArray = Array.from(files).slice(0, 3);
+            
+            fileArray.forEach((file, index) => {
+                if (file.type.startsWith('image/')) {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        uploadedImages.push(e.target.result);
+                        if (uploadedImages.length === fileArray.length) {
+                            updateImagePreview();
+                        }
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+        }
+        
+        function updateImagePreview() {
+            const preview = document.getElementById('uploaded-images-preview');
+            preview.innerHTML = '';
+            
+            if (uploadedImages.length === 0) {
+                preview.style.display = 'none';
+                return;
+            }
+            
+            preview.style.display = 'flex';
+            preview.style.flexDirection = 'row';
+            preview.style.gap = '8px';
+            preview.style.flexWrap = 'wrap';
+            uploadedImages.forEach((imageData, index) => {
+                const imgContainer = document.createElement('div');
+                imgContainer.style.position = 'relative';
+                imgContainer.style.display = 'inline-block';
+                
+                const img = document.createElement('img');
+                img.src = imageData;
+                img.style.width = '100px';
+                img.style.height = '100px';
+                img.style.objectFit = 'cover';
+                img.style.borderRadius = '4px';
+                img.style.border = '1px solid #D0D0D0';
+                
+                const removeBtn = document.createElement('button');
+                removeBtn.textContent = '×';
+                removeBtn.style.position = 'absolute';
+                removeBtn.style.top = '4px';
+                removeBtn.style.right = '4px';
+                removeBtn.style.background = '#333';
+                removeBtn.style.color = 'white';
+                removeBtn.style.border = 'none';
+                removeBtn.style.borderRadius = '50%';
+                removeBtn.style.width = '20px';
+                removeBtn.style.height = '20px';
+                removeBtn.style.cursor = 'pointer';
+                removeBtn.style.fontSize = '14px';
+                removeBtn.onclick = () => {
+                    uploadedImages.splice(index, 1);
+                    updateImagePreview();
+                };
+                
+                imgContainer.appendChild(img);
+                imgContainer.appendChild(removeBtn);
+                preview.appendChild(imgContainer);
+            });
+        }
+        
+        document.getElementById('event-image-upload').addEventListener('change', (e) => {
+            handleImageUpload(e.target.files);
+        });
+
+        document.getElementById('export-yaml-btn').addEventListener('click', exportToYAML);
+        document.getElementById('reload-btn').addEventListener('click', () => {
+            if (confirm('Reload from YAML file? This will replace any unsaved changes in localStorage.')) {
+                localStorage.removeItem('lifeEvents');
+                eventsData = {};
+                selectedEvents.clear(); // Clear selection on reload
+                loadData();
+            }
+        });
+
+        // Initialize
+        loadData();
+    </script>
+</body>
+</html>
+
